@@ -32,8 +32,7 @@ public:
 			window->poolEvents();
 			controller->update();
 			window->clear();
-			window->drawRect(pos->x, pos->y, 300, 300);
-			window->drawSprite(player->sprite, pos->x, pos->y);
+			window->drawRect(player->pos->x, player->pos->y, 100, 100);
 			window->display();
 		};
 		clock->start();

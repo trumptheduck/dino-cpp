@@ -1,4 +1,5 @@
 #include "Classes/Game/Game.h"
+#include "Classes/SFMLWindow/SFMLWindow.h"
 
 int main()
 {

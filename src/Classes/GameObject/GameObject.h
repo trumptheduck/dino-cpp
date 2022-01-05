@@ -18,7 +18,6 @@ public:
 	sf::Sprite sprite;
 	GameObject()
 	{
-		texture.loadFromFile("content/dino.png");
 		sprite.setTexture(texture);
 		sprite.setTextureRect(sf::IntRect(frame * spriteWidth, 0, spriteWidth, spriteHeight));
 		float scaleX = dim->x / texture.getSize().x;
