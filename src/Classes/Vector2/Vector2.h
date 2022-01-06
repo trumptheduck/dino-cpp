@@ -1,6 +1,6 @@
 #ifndef __Vector2_H_INCLUDED__ // if Node.h hasn't been included yet...
 #define __Vector2_H_INCLUDED__ //   #define this so the compiler knows it has been included
-
+//Chứa thông tin vector 2 chiều
 class Vector2
 {
 public:

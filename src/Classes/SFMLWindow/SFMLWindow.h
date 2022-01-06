@@ -56,6 +56,17 @@ public:
 		//Free up space
 		delete shape;
 	}
+	void drawBox(float x, float y, float width, float height)
+	{
+		sf::RectangleShape* shape = new sf::RectangleShape(sf::Vector2f(width, height));
+		shape->setPosition(x, y);
+		shape->setFillColor(sf::Color::Transparent);
+		shape->setOutlineThickness(3);
+		shape->setOutlineColor(sf::Color::Red);
+		draw(*shape);
+		//Free up space
+		delete shape;
+	}
 	void drawSprite(sf::Sprite sprite, float x, float y)
 	{
 		sf::Sprite* mSprite = new sf::Sprite(sprite);
