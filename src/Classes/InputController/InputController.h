@@ -4,20 +4,37 @@
 class InputController
 {
 public:
-	//Con trỏ của hai hàm thiết lập
-	std::function<void()> jump;
-	std::function<void()> duck;
+	std::function<void()> onSpacePressed;
+	std::function<void()> onShiftPressed;
+	std::function<void()> onUpPressed;
+	std::function<void()> onDownPressed;
+	std::function<void()> onEnterPressed;
+	std::function<void()> onEscPressed;
 	void update()
 	{
-		//Kiểm tra nếu người chơi ấn nút cách
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 		{
-			jump();
+			onSpacePressed();
 		}
-		//Kiểm tra nếu người chơi ấn shift
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 		{
-			duck();
+			onShiftPressed();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			onUpPressed();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			onDownPressed();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+		{
+			onEnterPressed();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			onEscPressed();
 		}
 	}
 };

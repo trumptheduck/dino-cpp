@@ -19,16 +19,16 @@ public:
 		}
 		return result;
 	}
-	std::string mContent;
+	sf::String mContent;
 	std::function<void()> mCallback;
 	Vector2* pos;
-	MenuItem(float x, float y, std::string content, std::function<void()> callback)
+	MenuItem(float x, float y, sf::String content, std::function<void()> callback)
 	{
 		pos = new Vector2(x, y);
 		mContent = content;
 		mCallback = callback;
 	}
-	MenuItem(std::string content, std::function<void()> callback)
+	MenuItem(sf::String content, std::function<void()> callback)
 	{
 		pos = new Vector2(0, 0);
 		mContent = content;
@@ -45,18 +45,23 @@ public:
 	Vector2* dim;
 	std::vector<MenuItem*> menuItems;
 	int index = 0;
-	std::string mTitle;
+	sf::String mTitle;
 	bool hasTitle = false;
-	MenuScreen(std::vector<MenuItem*> items, float width, float height, std::string title)
+	sf::Texture texture;
+	sf::Sprite sprite;
+
+	std::string imageSource = "content/dinosaur.png";
+	MenuScreen(sf::String title, float width, float height, std::string src, std::vector<MenuItem*> items)
 	{
+		imageSource = src;
 		dim = new Vector2(width, height);
+		texture.loadFromFile(imageSource);
+		sprite.setTexture(texture);
+		float scaleX = width / texture.getSize().x;
+		float scaleY = height / texture.getSize().y;
+		sprite.setScale(sf::Vector2f(scaleX, scaleY));
 		mTitle = title;
 		hasTitle = true;
-		menuItems = items;
-	}
-	MenuScreen(std::vector<MenuItem*> items, float width, float height)
-	{
-		dim = new Vector2(width, height);
 		menuItems = items;
 	}
 	void changeIndex(int amount)
@@ -77,6 +82,23 @@ public:
 	void activate() {
 		menuItems[index]->activate();
 	}
+	void draw(SFMLWindow* window) {
+		window->drawSprite(sprite, 0, 0);
+		window->drawText(50, 50, mTitle, sf::Color::White, 50);
+		int selectionIndex = 0;
+		for (auto& menuItem : menuItems)
+		{
+			if (index == selectionIndex)
+			{
+				window->drawText(menuItem->pos->x, menuItem->pos->y, menuItem->mContent, sf::Color::Red, 29);
+			}
+			else
+			{
+				window->drawText(menuItem->pos->x, menuItem->pos->y, menuItem->mContent, sf::Color::White, 29);
+			}
+			selectionIndex++;
+		}
+	}
 };
 #endif
 #ifndef __Menu_H_INCLUDED__ // if Node.h hasn't been included yet...
@@ -85,49 +107,22 @@ public:
 class Menu
 {
 public:
-	SFMLWindow* window = new SFMLWindow(new Vector2(1, 1));
 	std::vector<MenuScreen*> menuArray;
 	unsigned int menuIndex;
+	bool isOpened = false;
 	int counter = 0;
-	Menu()
+	Menu(std::vector<MenuScreen*> menus)
 	{
-		menuArray.push_back(new MenuScreen(MenuItem::generateItemList({
-		new MenuItem("StartGame", [&] {
-			close();
-		}),
-		new MenuItem("Options", [&] {
-			close();
-		}),
-			}, 100, 100, 50), 1024, 768, "Main Menu"));
-		close();
+		menuArray = menus;
 	}
-	void tick()
+	void tick(SFMLWindow* window)
 	{
-		if (window->window.isOpen())
-		{
-			update();
-			window->poolEvents();
-			window->clear();
-			int selectionIndex = 0;
-			for (auto& menuItem : menuArray[menuIndex]->menuItems)
-			{
-				if (menuArray[menuIndex]->index == selectionIndex)
-				{
-					window->drawText(menuItem->pos->x, menuItem->pos->y, menuItem->mContent, sf::Color::Red, 29);
-				}
-				else
-				{
-					window->drawText(menuItem->pos->x, menuItem->pos->y, menuItem->mContent, sf::Color::White, 29);
-				}
-				selectionIndex++;
-			}
-
-			window->display();
-		}
+		update();
+		draw(window);
 	}
 
-	void openWindow(int index) {
-		if (!window->window.isOpen())
+	void openMenu(int index) {
+		if (!isOpened)
 		{
 			if (index < 0)
 			{
@@ -141,22 +136,13 @@ public:
 			{
 				menuIndex = index;
 			}
-
-			if (menuArray[menuIndex]->hasTitle) {
-				window = new SFMLWindow(new Vector2(menuArray[menuIndex]->dim->x, menuArray[menuIndex]->dim->y), menuArray[menuIndex]->mTitle);
-			}
-			else {
-				window = new SFMLWindow(new Vector2(menuArray[menuIndex]->dim->x, menuArray[menuIndex]->dim->y));
-			}
-
+			isOpened = true;
 		}
+
 	}
 	void close()
 	{
-		if (window->window.isOpen())
-		{
-			window->window.close();
-		}
+		isOpened = false;
 	}
 
 	void update()
@@ -165,24 +151,22 @@ public:
 		{
 			counter--;
 		};
-		if (counter == 0)
-		{
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			{
-				menuArray[menuIndex]->changeIndex(-1);
-				counter = 10;
-			}
-			//Kiểm tra nếu người chơi ấn shift
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			{
-				menuArray[menuIndex]->changeIndex(1);
-				counter = 10;
-			}
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-			{
-				menuArray[menuIndex]->activate();
-				counter = 10;
-			}
+	}
+	void draw(SFMLWindow* window) {
+		window->clear();
+		menuArray[menuIndex]->draw(window);
+		window->display();
+	}
+	void moveIndex(int index) {
+		if (counter == 0) {
+			menuArray[menuIndex]->changeIndex(index);
+			counter = 10;
+		}
+	}
+	void confirm() {
+		if (counter == 0) {
+			menuArray[menuIndex]->activate();
+			counter = 10;
 		}
 	}
 };

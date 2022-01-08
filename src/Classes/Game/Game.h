@@ -9,6 +9,8 @@
 #include "Classes/Obstacle/Obstacle.h"
 #include "Classes/SFMLWindow/SFMLWindow.h"
 #include "Classes/Vector2/Vector2.h"
+#include "Classes/Player/Player.h"
+#include "Classes/Emitter/Emitter.h"
 #include <string.h>
 
 
@@ -16,76 +18,40 @@ class Game
 {
 
 public:
-	// Chiều rộng và chiều cao của cửa sổ;
-	float const width = 1024;
-	float const height = 768;
-	// Đồng hồ lặp để chạy hàm clock.tick() một số lần nhất định trong 1s, ở đây là 120 lần/s
-	Clock* clock = new Clock(60);
-	// Khởi tạo cửa sổ qua class SFMLWindow
-	SFMLWindow* window = new SFMLWindow(new Vector2(width, height), "Title");
-	// Khởi tạo class nhận tín hiệu điều khiển của người chơi
-	InputController* controller = new InputController();
-	// GameObject* player = new GameObject();
-	// Mảng chứa các vật cản
+	float mWidth = 0;
+	float mHeight = 0;
+	float groundLevel = 600;
 	std::vector<Obstacle*> obstacles;
-	// Mảng chứa những GameObject cần xóa, đẩy GameObject vào đây để xóa nó
 	std::vector<GameObject*> removeArray;
-	Menu* menu = new Menu();
+	Player* player = new Player(100, 100);
+	Emitter* emitter;
 
-	Game()
+	Game(float width, float height)
 	{
-		//Khởi tạo hàm điều khiển người chơi
-		// controller->jump = [&] {
-		// };
-		// controller->duck = [&] {
-		// 	player->pos->y -= 2;
-		// };
-
-		//Thiết lập hàm tick bằng một hàm lambda
-		clock->tick = [&] {
-			if (menu->window->window.isOpen())
-			{
-				menu->tick();
-			}
-			else
-			{
-				std::cout << "aaa" << std::endl;
-				window->window.setActive(true);
-				removeUnusedObjects();
-				window->poolEvents();
-				update();
-				draw();
-			}
+		emitter = new Emitter(0.01, 60);
+		emitter->emit = [&] {
+			addObstacle(new Obstacle(300, 100, 50, 50, "content/sfml.png"));
 		};
+		mWidth = width;
+		mHeight = height;
 	};
-	//Bắt đầu trò chơi
-	void start()
-	{
-		clock->start();
-	}
-	//Tạm dừng trò chơi
-	void pause()
-	{
-		clock->pause();
-	}
-	//Tiếp tục
-	void unpause()
-	{
-		clock->unpause();
+	void tick(SFMLWindow* window) {
+		removeUnusedObjects();
+		update();
+		draw(window);
 	}
 	void update()
 	{
 		//Kiểm tra bàn phím người chơi và update điều khiển
-		controller->update();
 
 		//Update người chơi
 		//Hàm implementGravity sẽ tạo trọng lực cho người chơi, người chơi sẽ rơi xuống cho tới khi
 		// chạm tới tọa độ mặt đất ở tham số thứ 2, ở đây là 600;
-
-		// LogicController::implementGravity(player, 600);
+		emitter->tick();
+		LogicController::implementGravity(player, groundLevel);
 
 		//Chạy hàm update cho người chơi
-		// player->update();
+		player->update();
 
 		//Vòng lặp for tất cả GameObject ở trong mảng Vật cản obstacles
 		for (auto& gameObject : obstacles)
@@ -102,14 +68,16 @@ public:
 		}
 		//Xóa những GameObject đã được thêm vào mảng xóa
 	}
-	void draw()
+	void draw(SFMLWindow* window)
 	{
 		window->clear();
 		// Vẽ hitbox của người chơi
-		// player->drawHitbox(window);
+		player->drawHitbox(window);
+		player->draw(window);
 		for (auto& gameObject : obstacles)
 		{
 			//Gọi hàm vẽ của vật cản
+			gameObject->drawHitbox(window);
 			gameObject->draw(window);
 		}
 
@@ -146,7 +114,7 @@ public:
 	//Kiểm tra nếu GameObject ở ngoài khoảng vẽ, tức là 2 lần kích cỡ màn hình, nếu ở ngoài trả về true và ngược lại
 	bool checkIfObjectOutOfBound(GameObject* object)
 	{
-		return (object->pos->x < -width || object->pos->x > 2 * width || object->pos->y < -height || object->pos->y > 2 * width);
+		return (object->pos->x < -mWidth || object->pos->x > 2 * mWidth || object->pos->y < -mHeight || object->pos->y > 2 * mHeight);
 	}
 };
 

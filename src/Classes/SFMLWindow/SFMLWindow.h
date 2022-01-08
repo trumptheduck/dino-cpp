@@ -2,7 +2,7 @@
 #include "Platform/Platform.hpp"
 
 #ifndef __SFMLWindow_H_INCLUDED__	  // if Node.h hasn't been included yet...
-	#define __SFMLWindow_H_INCLUDED__ //   #define this so the compiler knows it has been included
+#define __SFMLWindow_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 class SFMLWindow
 {
@@ -11,21 +11,13 @@ public:
 	sf::Event event;
 	sf::Font font;
 
-	SFMLWindow(Vector2* dim, std::string title)
+	SFMLWindow(Vector2* dim, sf::String title)
 	{
 		font.loadFromFile("content/arial.ttf");
 		util::Platform platform;
 		float screenScalingFactor = platform.getScreenScalingFactor(window.getSystemHandle());
 		window.create(sf::VideoMode(dim->x * screenScalingFactor, dim->y * screenScalingFactor), title);
 		platform.setIcon(window.getSystemHandle());
-		// while (window.isOpen())
-		// {
-		// 	while (window.pollEvent(event))
-		// 	{
-		// 		if (event.type == sf::Event::Closed)
-		// 			window.close();
-		// 	}
-		// }
 	}
 	SFMLWindow(Vector2* dim)
 	{
