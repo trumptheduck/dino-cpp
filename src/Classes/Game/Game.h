@@ -35,10 +35,8 @@ public:
 	Game()
 	{
 		//Khởi tạo hàm điều khiển người chơi
-		controller->jump = [&] {
-			menu->openWindow(0);
-		};
-		menu->openWindow(0);
+		// controller->jump = [&] {
+		// };
 		// controller->duck = [&] {
 		// 	player->pos->y -= 2;
 		// };
@@ -57,13 +55,6 @@ public:
 				window->poolEvents();
 				update();
 				draw();
-				int minN = 0;
-				int maxN = 10000;
-				int r = minN + rand() % (maxN + 1 - minN);
-				if (r < 100)
-				{
-					addObstacle(new Obstacle(300, 100, 50, 50, "content/sfml.png"));
-				}
 			}
 		};
 	};
