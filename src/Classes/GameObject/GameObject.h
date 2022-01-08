@@ -1,15 +1,23 @@
+#ifndef __GameObject_H_INCLUDED__	  // if Node.h hasn't been included yet...
+#define __GameObject_H_INCLUDED__ //   #define this so the compiler knows it has been included
+
 #include "Classes/SFMLWindow/SFMLWindow.h"
 #include "Classes/Utils/Utils.h"
 #include "Classes/Vector2/Vector2.h"
 
-#ifndef __GameObject_H_INCLUDED__	  // if Node.h hasn't been included yet...
-	#define __GameObject_H_INCLUDED__ //   #define this so the compiler knows it has been included
-
 class GameObject
 {
+private:
+	int generateUniqueId()
+	{
+		int minN = 10000000;
+		int maxN = 99999999;
+		return minN + rand() % (maxN + 1 - minN);
+	}
+
 public:
 	// ID của vật thể trong game, dùng để nhận diện
-	std::string uuid = Utils::generateUUID(16);
+	int uuid = generateUniqueId();
 	// Vị trí vật thể
 	Vector2* pos;
 	// Kích cỡ vật thể
@@ -23,8 +31,9 @@ public:
 	sf::Sprite sprite;
 
 	std::string imageSource = "content/dinosaur.png";
-	GameObject(float x, float y, float width, float height)
+	GameObject(float x, float y, float width, float height, std::string src)
 	{
+		imageSource = src;
 		pos = new Vector2(x, y);
 		dim = new Vector2(width, height);
 		texture.loadFromFile(imageSource);

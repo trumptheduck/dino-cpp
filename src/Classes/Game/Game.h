@@ -1,24 +1,26 @@
+#ifndef __Game_H_INCLUDED__		// if Node.h hasn't been included yet...
+#define __Game_H_INCLUDED__ //   #define this so the compiler knows it has been included
+
 #include "Classes/Clock/Clock.h"
 #include "Classes/GameObject/GameObject.h"
 #include "Classes/InputController/InputController.h"
 #include "Classes/LogicController/LogicController.h"
+#include "Classes/Menu/Menu.h"
 #include "Classes/Obstacle/Obstacle.h"
 #include "Classes/SFMLWindow/SFMLWindow.h"
 #include "Classes/Vector2/Vector2.h"
 #include <string.h>
 
-#ifndef __Game_H_INCLUDED__		// if Node.h hasn't been included yet...
-	#define __Game_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 class Game
 {
 
 public:
 	// Chiều rộng và chiều cao của cửa sổ;
-	float const width = 900;
-	float const height = 600;
+	float const width = 1024;
+	float const height = 768;
 	// Đồng hồ lặp để chạy hàm clock.tick() một số lần nhất định trong 1s, ở đây là 120 lần/s
-	Clock* clock = new Clock(120);
+	Clock* clock = new Clock(60);
 	// Khởi tạo cửa sổ qua class SFMLWindow
 	SFMLWindow* window = new SFMLWindow(new Vector2(width, height), "Title");
 	// Khởi tạo class nhận tín hiệu điều khiển của người chơi
@@ -28,22 +30,41 @@ public:
 	std::vector<Obstacle*> obstacles;
 	// Mảng chứa những GameObject cần xóa, đẩy GameObject vào đây để xóa nó
 	std::vector<GameObject*> removeArray;
+	Menu* menu = new Menu();
 
 	Game()
 	{
 		//Khởi tạo hàm điều khiển người chơi
-		// controller->jump = [&] {
-		// 	player->jump();
-		// };
+		controller->jump = [&] {
+			menu->openWindow(0);
+		};
+		menu->openWindow(0);
 		// controller->duck = [&] {
 		// 	player->pos->y -= 2;
 		// };
 
 		//Thiết lập hàm tick bằng một hàm lambda
 		clock->tick = [&] {
-			window->poolEvents();
-			update();
-			draw();
+			if (menu->window->window.isOpen())
+			{
+				menu->tick();
+			}
+			else
+			{
+				std::cout << "aaa" << std::endl;
+				window->window.setActive(true);
+				removeUnusedObjects();
+				window->poolEvents();
+				update();
+				draw();
+				int minN = 0;
+				int maxN = 10000;
+				int r = minN + rand() % (maxN + 1 - minN);
+				if (r < 100)
+				{
+					addObstacle(new Obstacle(300, 100, 50, 50, "content/sfml.png"));
+				}
+			}
 		};
 	};
 	//Bắt đầu trò chơi
@@ -63,9 +84,6 @@ public:
 	}
 	void update()
 	{
-		//Xóa những GameObject đã được thêm vào mảng xóa
-		removeUnusedObjects();
-
 		//Kiểm tra bàn phím người chơi và update điều khiển
 		controller->update();
 
@@ -86,10 +104,12 @@ public:
 			//Kiểm tra xem vật cản đã vượt quá cửa sổ hay chưa
 			if (checkIfObjectOutOfBound(gameObject))
 			{
+
 				//Nếu đã vượt quá cửa sổ, ta không cần vật cản đó nữa, nên xóa nó đi
 				flagObjectForRemoval(gameObject);
 			}
 		}
+		//Xóa những GameObject đã được thêm vào mảng xóa
 	}
 	void draw()
 	{
@@ -123,10 +143,10 @@ public:
 			for (auto& object : obstacles)
 			{
 				index++;
-				if (objectToRemove->uuid == object->uuid)
+				if (objectToRemove == object)
 				{
-					obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), object), obstacles.end());
 					delete object;
+					obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), object), obstacles.end());
 				}
 			}
 		}

@@ -1,10 +1,11 @@
+#ifndef __Clock_H_INCLUDED__	 // if Node.h hasn't been included yet...
+#define __Clock_H_INCLUDED__ //   #define this so the compiler knows it has been included
+
 #include <chrono>
 #include <cstdio>
 #include <iostream>
 #include <thread>
 
-#ifndef __Clock_H_INCLUDED__	 // if Node.h hasn't been included yet...
-	#define __Clock_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 class Clock
 {

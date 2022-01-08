@@ -1,7 +1,7 @@
 #include "Classes/GameObject/GameObject.h"
 
 #ifndef __LogicController_H_INCLUDED__	   // if Node.h hasn't been included yet...
-	#define __LogicController_H_INCLUDED__ //   #define this so the compiler knows it has been included
+#define __LogicController_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 class LogicController
 {

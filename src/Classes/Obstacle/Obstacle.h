@@ -8,21 +8,21 @@ class Obstacle : public GameObject
 {
 public:
 	//Tốc độ di chuyển của vật thể
-	float speedX = 1;
+	float speedX = 2;
 	// Ghi đè lên hàm update vật thể
 	void update()
 	{
 		//Khiến cho vật thể di chuyển mỗi lần update
 		pos->x -= speedX;
 	}
-	Obstacle(float x, float y) :
-		GameObject(x, y, 100, 100)
+	Obstacle(float x, float y, std::string src) :
+		GameObject(x, y, 100, 100, src)
 	{
 		pos->x = x;
 		pos->y = y;
 	}
-	Obstacle(float x, float y, float width, float height) :
-		GameObject(x, y, width, height)
+	Obstacle(float x, float y, float width, float height, std::string src) :
+		GameObject(x, y, width, height, src)
 	{
 		pos->x = x;
 		pos->y = y;
@@ -30,4 +30,11 @@ public:
 		dim->y = height;
 	}
 };
+// class Trex : public Obstacle
+// {
+// public:
+// 	float speedX = 0.5;
+// 	Trex(float xx, float yy) :
+// 		Obstacle(xx, yy, 100, 100, "content/slider2.jpg");
+// };
 #endif
