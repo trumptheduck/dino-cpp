@@ -4,7 +4,7 @@
 class Program {
 public:
 	float const width = 1024;
-	float const height = 600;
+	float const height = 768;
 	SFMLWindow* window = new SFMLWindow(new Vector2(width, height), "Title");
 	std::vector<MenuScreen*> menuArray = {
 		new MenuScreen("Main Menu", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",

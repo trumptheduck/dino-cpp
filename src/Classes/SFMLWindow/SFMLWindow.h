@@ -15,16 +15,14 @@ public:
 	{
 		font.loadFromFile("content/arial.ttf");
 		util::Platform platform;
-		float screenScalingFactor = platform.getScreenScalingFactor(window.getSystemHandle());
-		window.create(sf::VideoMode(dim->x * screenScalingFactor, dim->y * screenScalingFactor), title);
+		window.create(sf::VideoMode(dim->x, dim->y), title);
 		platform.setIcon(window.getSystemHandle());
 	}
 	SFMLWindow(Vector2* dim)
 	{
 		font.loadFromFile("content/arial.ttf");
 		util::Platform platform;
-		float screenScalingFactor = platform.getScreenScalingFactor(window.getSystemHandle());
-		window.create(sf::VideoMode(dim->x * screenScalingFactor, dim->y * screenScalingFactor), "", sf::Style::None);
+		window.create(sf::VideoMode(dim->x, dim->y), "", sf::Style::None);
 		platform.setIcon(window.getSystemHandle());
 		// while (window.isOpen())
 		// {
