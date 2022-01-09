@@ -8,7 +8,7 @@ public:
 	void jump() {
 		if (isGrounded) {
 			pos->y -= 10;
-			accelerationY = -10;
+			accelerationY = -24;
 		}
 		else {
 			accelerationY -= 0.2;

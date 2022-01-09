@@ -23,7 +23,7 @@ public:
 		else
 		{
 			obj->isGrounded = false;
-			obj->accelerationY += 0.5;
+			obj->accelerationY += 1;
 			obj->pos->y += obj->accelerationY;
 		}
 	}

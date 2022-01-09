@@ -86,13 +86,14 @@ public:
 	}
 	void drawText(float x, float y, std::string content, sf::Color color, int fontSize)
 	{
-		sf::Text text;
-		text.setFont(font);
-		text.setString(content);
-		text.setCharacterSize(fontSize);
-		text.setFillColor(color);
-		text.setPosition(x, y);
-		draw(text);
+		sf::Text* text = new sf::Text();
+		text->setFont(font);
+		text->setString(content);
+		text->setCharacterSize(fontSize);
+		text->setFillColor(color);
+		text->setPosition(x, y);
+		draw(*text);
+		delete text;
 	}
 	void draw(sf::Drawable& shape)
 	{

@@ -13,23 +13,25 @@ public:
 	Emitter(float rate, float interval) {
 		mRate = rate;
 		mInterval = interval;
+		srand(time(nullptr));
+	}
+	void setParameters(float rate, float interval) {
+		mRate = rate;
+		mInterval = interval;
 	}
 	void tick() {
 		if (counter > 0) {
 			counter--;
-			std::cout << counter << std::endl;
 		}
 		else {
 			int minN = 0;
 			int maxN = 10000;
 			int r = minN + rand() % (maxN + 1 - minN);
 			if (r < mRate * maxN) {
-				std::cout << "Xac suat dung" << std::endl;
 				emit();
 				counter = mInterval;
 			}
 			else {
-				std::cout << "Xac suat sai" << std::endl;
 			}
 		}
 	}
