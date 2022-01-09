@@ -28,19 +28,4 @@ public:
 };
 
 
-class Analysis : public AcademicObstacle
-{
-public:
-    float speedX = 0;
-    Analysis(float wh, float ht) :
-        AcademicObstacle(1000, 400, wh, ht, "content/Sami-hust.jpg") {};
-};
-class Algebra : public AcademicObstacle
-{
-public:
-    float speedX = 0;
-    Algebra(float wh, float ht) :
-        AcademicObstacle(900, 400, wh, ht, "content/slider2.jpg") {};
-};
-
 #endif
