@@ -2,29 +2,69 @@
 #define __Obstacles_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 #include "Classes/Obstacle/Obstacle.h"
+#include "Classes/Vector2/Vector2.h"
 
-class KillObstacle : public Obstacle {
+class Cop : public Obstacle {
 public:
-    KillObstacle(float x, float y, float width, float height, std::string src)
-        : Obstacle(x, y, width, height, src) {
-        isInstaKill = true;
-    }
+	Cop(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 170, 150, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 3;
+	}
 };
 
-class MoneyObstacle : public Obstacle {
+class Algebra : public Obstacle {
 public:
-    MoneyObstacle(float x, float y, float width, float height, std::string src, float pMoney)
-        : Obstacle(x, y, width, height, src) {
-        money = pMoney;
-    }
+	Algebra(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 100, 150, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 0;
+	}
 };
 
-class AcademicObstacle : public Obstacle {
+class Analysis : public Obstacle {
 public:
-    AcademicObstacle(float x, float y, float width, float height, std::string src)
-        : Obstacle(x, y, width, height, src) {
-        increaseWarning = true;
-    }
+	Analysis(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 100, 150, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 0;
+	}
+};
+
+class Physics : public Obstacle {
+public:
+	Physics(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 100, 150, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 7;
+	}
+};
+
+class Philosophy : public Obstacle {
+public:
+	Philosophy(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 100, 150, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 2;
+	}
+};
+
+class Girlfriend : public Obstacle {
+public:
+	Girlfriend(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 50, 190, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = -4;
+	}
+};
+
+class PigSpear : public Obstacle {
+public:
+	PigSpear(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 220, 20, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = 10;
+	}
+};
+class Sami : public Obstacle {
+public:
+	Sami(Vector2* vector, sf::Texture ptexture) : Obstacle(vector->x, vector->y, 120, 176, ptexture) {
+		pos->y = vector->y - dim->y;
+		speed->x = -5;
+	}
 };
 
 

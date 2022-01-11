@@ -7,50 +7,119 @@
 #include "Classes/LogicController/LogicController.h"
 #include "Classes/Menu/Menu.h"
 #include "Classes/Obstacle/Obstacle.h"
+#include "Classes/Obstacle/Obstacles.h"
 #include "Classes/SFMLWindow/SFMLWindow.h"
 #include "Classes/Vector2/Vector2.h"
 #include "Classes/Player/Player.h"
 #include "Classes/Emitter/Emitter.h"
-#include <string.h>
+#include <math.h>
 
+class Loader {
+public:
+	std::map<std::string, sf::Texture> textures;
+	std::vector<std::string> sources;
+	Loader(std::vector<std::string> imageSources) {
+		sources = imageSources;
+	}
+	void load() {
+		for (auto& source : sources) {
+			sf::Texture texture;
+			texture.loadFromFile(source);
+			textures.insert(std::pair<std::string, sf::Texture>(source, texture));
+		}
+	}
+};
 
 class Game
 {
 
 public:
+	//Basic parameters
 	float mWidth = 0;
 	float mHeight = 0;
-	float groundLevel = 700;
-
+	//Game flags
+	bool isOver = false;
+	bool showHitbox = false;
+	//Game parameters
 	float difficulty = 1;
-	float gameSpeed = 10;
+	float difficultyFactor = 0.0003;
+	float gameSpeed = 5;
 	float baseDistance = 20;
 	float baseProbability = 0.005;
 	float distanceFactor = 10;
 	float probabilityFactor = 0.002;
-
+	float scoreMultiplier = 1000;
+	float groundLevel = 700;
+	//Spawn position config
+	Vector2* topSpawnPosition = new Vector2(1500, 300);
+	Vector2* middleSpawnPosition = new Vector2(1500, 500);
+	Vector2* bottomSpawnPosition = new Vector2(1500, 700);
+	//Game data
 	std::vector<Obstacle*> obstacles;
 	std::vector<GameObject*> removeArray;
-	std::vector<Obstacle*> obstacleArray;
-
-	GameObject* road1 = new GameObject(0, 0, 3000, 300, "content/road.png");
-	GameObject* road2 = new GameObject(3000, 0, 3000, 300, "content/road.png");
-	Player* player = new Player(100, 100);
-	Emitter* emitter;
-
+	std::vector<Obstacle*> regularObstacleCache;
+	std::vector<Obstacle*> middleObstacleCache;
+	Player* player;
+	//Game dependencies
+	Emitter* regularEmitter;
+	Emitter* middleEmitter;
+	std::vector<std::string> imageSources = {
+	"content/cop.png",
+	"content/algebra.jpg",
+	"content/analysis.jpg",
+	"content/physics.jpg",
+	"content/philosophy.jpg",
+	"content/girlfriend.png",
+	"content/phonglon.png",
+	"content/player.png",
+	"content/road.png",
+	"content/sami.png",
+	};
+	Loader* loader = new Loader(imageSources);
+	//Game background
+	GameObject* road1;
+	GameObject* road2;
 	sf::Texture backGroundTexture;
 	sf::Sprite backGroundSprite;
 
 	Game(float width, float height)
 	{
+		loader->load();
+		player = new Player(100, 100, loader->textures["content/player.png"]);
+		road1 = new GameObject(0, 0, 3000, 300, loader->textures["content/road.png"]);
+		road2 = new GameObject(3000, 0, 3000, 300, loader->textures["content/road.png"]);
 		backGroundTexture.loadFromFile("content/sky.png");
 		backGroundSprite.setTexture(backGroundTexture);
-		emitter = new Emitter(baseProbability, baseDistance);
-		obstacleArray.push_back(new Obstacle(1500, 550, 170, 150, "content/cop.png"));
-		obstacleArray.push_back(new Obstacle(1500, 400, 150, 150, "content/sfml.png"));
-		obstacleArray.push_back(new Obstacle(1500, 300, 150, 150, "content/dino.png"));
-		emitter->emit = [&] {
-			Obstacle* selectedObstacle = selectRandomObject(obstacleArray);
+		regularEmitter = new Emitter(baseProbability, baseDistance);
+		middleEmitter = new Emitter(baseProbability / 3, baseDistance);
+		//Thêm vật cản mẫu
+		regularObstacleCache.push_back(new Cop(bottomSpawnPosition, loader->textures["content/cop.png"]));
+		regularObstacleCache.push_back(new Girlfriend(bottomSpawnPosition, loader->textures["content/girlfriend.png"]));
+		regularObstacleCache.push_back(new Analysis(bottomSpawnPosition, loader->textures["content/analysis.jpg"]));
+		regularObstacleCache.push_back(new Analysis(topSpawnPosition, loader->textures["content/analysis.jpg"]));
+		regularObstacleCache.push_back(new Algebra(bottomSpawnPosition, loader->textures["content/algebra.jpg"]));
+		regularObstacleCache.push_back(new Algebra(topSpawnPosition, loader->textures["content/algebra.jpg"]));
+		regularObstacleCache.push_back(new Physics(bottomSpawnPosition, loader->textures["content/physics.jpg"]));
+		regularObstacleCache.push_back(new Physics(topSpawnPosition, loader->textures["content/physics.jpg"]));
+		regularObstacleCache.push_back(new Philosophy(bottomSpawnPosition, loader->textures["content/philosophy.jpg"]));
+		regularObstacleCache.push_back(new Philosophy(topSpawnPosition, loader->textures["content/philosophy.jpg"]));
+		regularObstacleCache.push_back(new PigSpear(bottomSpawnPosition, loader->textures["content/phonglon.png"]));
+		regularObstacleCache.push_back(new Sami(topSpawnPosition, loader->textures["content/sami.png"]));
+
+
+		middleObstacleCache.push_back(new Analysis(middleSpawnPosition, loader->textures["content/analysis.jpg"]));
+		middleObstacleCache.push_back(new Algebra(middleSpawnPosition, loader->textures["content/algebra.jpg"]));
+		middleObstacleCache.push_back(new PigSpear(middleSpawnPosition, loader->textures["content/phonglon.png"]));
+		middleObstacleCache.push_back(new Philosophy(middleSpawnPosition, loader->textures["content/philosophy.jpg"]));
+		middleObstacleCache.push_back(new Sami(middleSpawnPosition, loader->textures["content/sami.png"]));
+
+		//Thiết lập emit
+		regularEmitter->emit = [&] {
+			Obstacle* selectedObstacle = selectRandomObject(regularObstacleCache);
+			addObstacle(new Obstacle(selectedObstacle));
+		};
+		middleEmitter->emit = [&] {
+			Obstacle* selectedObstacle = selectRandomObject(middleObstacleCache);
 			addObstacle(new Obstacle(selectedObstacle));
 		};
 		mWidth = width;
@@ -60,26 +129,33 @@ public:
 		int minN = 0;
 		int maxN = array.size() - 1;
 		int r = minN + rand() % (maxN + 1 - minN);
-		std::cout << r << "\n";
 		return array[r];
 	}
+	void lose() {
+		isOver = true;
+	}
 	void tick(SFMLWindow* window) {
+		//Xóa những GameObject đã được thêm vào mảng xóa
 		removeUnusedObjects();
-		update(window);
+		if (!isOver) {
+			update(window);
+		}
 		draw(window);
 	}
 	void update(SFMLWindow* window)
 	{
-		//Kiểm tra bàn phím người chơi và update điều khiển
+		difficulty += difficultyFactor;
+		regularEmitter->setParameters(
+			baseProbability + probabilityFactor * difficulty,
+			baseDistance + distanceFactor * difficulty);
+		middleEmitter->setParameters(
+			(baseProbability + probabilityFactor * difficulty) / 2,
+			baseDistance + distanceFactor * difficulty);
+		regularEmitter->tick();
+		middleEmitter->tick();
 
 		//Update người chơi
 		//Hàm implementGravity sẽ tạo trọng lực cho người chơi, người chơi sẽ rơi xuống cho tới khi
-		// chạm tới tọa độ mặt đất ở tham số thứ 2, ở đây là 600;
-		difficulty += 0.0001;
-		emitter->setParameters(
-			baseProbability + probabilityFactor * difficulty,
-			baseDistance + distanceFactor * difficulty);
-		emitter->tick();
 		LogicController::implementGravity(player, groundLevel);
 
 		//Chạy hàm update cho người chơi
@@ -101,17 +177,15 @@ public:
 			gameObject->setSpeed(gameSpeed * difficulty + 10);
 			gameObject->update();
 			if (LogicController::checkForCollision(player, gameObject)) {
-				std::cout << "Collided" << "\n";
+				lose();
 			}
 			//Kiểm tra xem vật cản đã vượt quá cửa sổ hay chưa
 			if (checkIfObjectOutOfBound(gameObject))
 			{
-
 				//Nếu đã vượt quá cửa sổ, ta không cần vật cản đó nữa, nên xóa nó đi
 				flagObjectForRemoval(gameObject);
 			}
 		}
-		//Xóa những GameObject đã được thêm vào mảng xóa
 	}
 	void draw(SFMLWindow* window)
 	{
@@ -119,16 +193,53 @@ public:
 		window->drawSprite(backGroundSprite, 0, 0);
 		road1->draw(window);
 		road2->draw(window);
-		player->drawHitbox(window);
-		player->draw(window);
 		for (auto& gameObject : obstacles)
 		{
 			//Gọi hàm vẽ của vật cản
-			gameObject->drawHitbox(window);
+			if (showHitbox) gameObject->drawHitbox(window);
 			gameObject->draw(window);
 		}
-
+		if (showHitbox) player->drawHitbox(window);
+		player->draw(window);
+		drawUI(window);
 		window->display();
+	}
+	void drawUI(SFMLWindow* window) {
+		window->drawText(20, 20, "Diem Ren Luyen: " + std::to_string((int)round((difficulty - 1) * scoreMultiplier)), sf::Color::Red, 30);
+		window->drawText(20, 70, "Hoc Bong: " + getRank(), sf::Color::White, 30);
+		if (isOver) {
+			sf::RectangleShape overlay;
+			overlay.setSize(sf::Vector2f(window->window.getSize().x, window->window.getSize().y));
+			overlay.setFillColor(sf::Color(0, 0, 0, 128));
+			window->window.draw(overlay);
+			window->drawText(300, 250, "YOU CAN STUDY NOMORE!", sf::Color::Red, 60);
+			window->drawText(300, 350, "Diem Ren Luyen: " + std::to_string((int)round((difficulty - 1) * scoreMultiplier)), sf::Color::White, 30);
+			window->drawText(300, 400, "Hoc Bong: " + getRank(), sf::Color::White, 30);
+			window->drawText(300, 450, "Press Esc to Retake Entrance Test", sf::Color::White, 30);
+		}
+	}
+	std::string getRank() {
+		float score = (difficulty - 1) * scoreMultiplier;
+		float rankGap = 1000;
+		if (score >= rankGap * 6) {
+			return "S+";
+		}
+		if (score >= rankGap * 5) {
+			return "S";
+		}
+		if (score >= rankGap * 4) {
+			return "A";
+		}
+		if (score >= rankGap * 3) {
+			return "B";
+		}
+		if (score >= rankGap * 2) {
+			return "C";
+		}
+		if (score >= rankGap * 1) {
+			return "D";
+		}
+		return "F";
 	}
 	//Thêm vật cản vào mảng vật cản
 	void addObstacle(Obstacle* obstacle)

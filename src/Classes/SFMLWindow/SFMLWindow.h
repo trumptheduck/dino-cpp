@@ -1,8 +1,9 @@
+#ifndef __SFMLWindow_H_INCLUDED__	  // if Node.h hasn't been included yet...
+#define __SFMLWindow_H_INCLUDED__ //   #define this so the compiler knows it has been included
+
 #include "Classes/Vector2/Vector2.h"
 #include "Platform/Platform.hpp"
 
-#ifndef __SFMLWindow_H_INCLUDED__	  // if Node.h hasn't been included yet...
-#define __SFMLWindow_H_INCLUDED__ //   #define this so the compiler knows it has been included
 
 class SFMLWindow
 {
@@ -24,14 +25,6 @@ public:
 		util::Platform platform;
 		window.create(sf::VideoMode(dim->x, dim->y), "", sf::Style::None);
 		platform.setIcon(window.getSystemHandle());
-		// while (window.isOpen())
-		// {
-		// 	while (window.pollEvent(event))
-		// 	{
-		// 		if (event.type == sf::Event::Closed)
-		// 			window.close();
-		// 	}
-		// }
 	}
 	void poolEvents()
 	{

@@ -1,9 +1,10 @@
+#ifndef __MenuItem_H_INCLUDED__ // if Node.h hasn't been included yet...
+#define __MenuItem_H_INCLUDED_
+
 #include "Classes/Clock/Clock.h"
 #include "Classes/SFMLWindow/SFMLWindow.h"
 #include "Classes/Vector2/Vector2.h"
 
-#ifndef __MenuItem_H_INCLUDED__ // if Node.h hasn't been included yet...
-#define __MenuItem_H_INCLUDED_
 
 class MenuItem
 {

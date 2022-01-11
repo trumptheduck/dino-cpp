@@ -4,16 +4,21 @@
 #include "Classes/GameObject/GameObject.h"
 class Player : public GameObject {
 public:
-	Player(float x, float y) : GameObject(x, y, 70, 140, "content/player.png") {};
+	Player(float x, float y, sf::Texture ptexture) : GameObject(x, y, 60, 170, ptexture) {};
 	void jump() {
 		if (isGrounded) {
 			pos->y -= 10;
-			accelerationY = -24;
+			speed->y = -28;
 		}
 		else {
-			accelerationY -= 0.2;
+			speed->y -= 0.2;
 		}
 	};
+	void fall() {
+		if (!isGrounded) {
+			speed->y = 25;
+		}
+	}
 };
 
 #endif

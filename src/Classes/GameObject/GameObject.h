@@ -23,20 +23,18 @@ public:
 	// Kích cỡ vật thể
 	Vector2* dim;
 	// Gia tốc rơi của vật thể
-	float accelerationY = 0;
+	Vector2* speed = new Vector2(0, 0);
 	// Vật thể có ở trên mặt đất hay không
 	bool isGrounded = false;
 
-	sf::Texture texture;
 	sf::Sprite sprite;
+	sf::Texture texture;
 
-	std::string imageSource = "content/dinosaur.png";
-	GameObject(float x, float y, float width, float height, std::string src)
+	GameObject(float x, float y, float width, float height, sf::Texture ptexture)
 	{
-		imageSource = src;
 		pos = new Vector2(x, y);
 		dim = new Vector2(width, height);
-		texture.loadFromFile(imageSource);
+		texture = ptexture;
 		sprite.setTexture(texture);
 		float scaleX = dim->x / texture.getSize().x;
 		float scaleY = dim->y / texture.getSize().y;

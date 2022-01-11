@@ -1,22 +1,24 @@
 #include "Classes/Game/Game.h"
 #include "Classes/Obstacle/Obstacle.h"
+#include <map>
 
 class Program {
 public:
-	float const width = 1024;
+	float const width = 1400;
 	float const height = 768;
-	SFMLWindow* window = new SFMLWindow(new Vector2(width, height), "Title");
+	SFMLWindow* window = new SFMLWindow(new Vector2(width, height), "Bach Khoa Survival");
 	std::vector<MenuScreen*> menuArray = {
-		new MenuScreen("Main Menu", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
+		new MenuScreen("You got admitted to HUST! What are you gonna do?", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
 			MenuItem::generateItemList({
-				new MenuItem("New Game", [&] {
+				new MenuItem("Attend university", [&] {
+					newGame();
 					menu->close();
 				}),
-				new MenuItem("Options", [&] {
+				new MenuItem("Get ready", [&] {
 					menu->close();
 					menu->openMenu(1);
 				}),
-				new MenuItem("Quit game", [&] {
+				new MenuItem("Stay home", [&] {
 					exit(0);
 				}),
 			}, 100, 150, 50)),
@@ -33,27 +35,28 @@ public:
 					menu->openMenu(0);
 				}),
 			}, 100, 150, 50)),
-		new MenuScreen("Game Paused", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
+		new MenuScreen("Education reserved", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
 			MenuItem::generateItemList({
-				new MenuItem("Continue", [&] {
+				new MenuItem("Go back to study", [&] {
 					menu->close();
 				}),
-				new MenuItem("Options", [&] {
+				new MenuItem("Get ready", [&] {
 					menu->close();
 					menu->openMenu(1);
 				}),
-				new MenuItem("Return to Title", [&] {
+				new MenuItem("Retake test", [&] {
 					menu->close();
 					menu->openMenu(0);
 				}),
 			}, 100, 150, 50)),
 
 	};
-	Game* game = new Game(width, height);
+	Game* game;
 	Menu* menu = new Menu(menuArray);
 	InputController* keyboard = new InputController();
 	Clock* clock = new Clock(120);
 	Program() {
+		newGame();
 		keyboard->onUpPressed = [&] {
 			if (menu->isOpened) {
 				menu->moveIndex(-1);
@@ -72,15 +75,25 @@ public:
 		keyboard->onSpacePressed = [&] {
 			if (menu->isOpened) {}
 			else {
-				game->player->jump();
+				if (!game->isOver)
+					if (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) game->player->jump();
 			}
 		};
 		keyboard->onShiftPressed = [&] {
-
+			if (menu->isOpened) {}
+			else {
+				if (!game->isOver)
+					game->player->fall();
+			}
 		};
 		keyboard->onEscPressed = [&] {
 			if (!menu->isOpened) {
-				menu->openMenu(2);
+				if (game->isOver) {
+					menu->openMenu(0);
+				}
+				else {
+					menu->openMenu(2);
+				}
 			}
 		};
 		menu->openMenu(0);
@@ -111,14 +124,17 @@ public:
 	{
 		clock->unpause();
 	}
+	void newGame() {
+		game = new Game(width, height);
+	}
 };
 
 int main()
 {
 
-#if defined(_DEBUG)
-	std::cout << "Hello World!" << std::endl;
-#endif
+	// #if defined(_DEBUG)
+	// 	std::cout << "Hello World!" << std::endl;
+	// #endif
 
 	Program* program = new Program();
 	program->start();
