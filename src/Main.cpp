@@ -18,6 +18,19 @@ public:
 					menu->close();
 					menu->openMenu(1);
 				}),
+				new MenuItem("Best students", [&] {
+					menu->close();
+					buildScore();
+					menu->openMenu(3);
+				}),
+				new MenuItem("How to study", [&] {
+					menu->close();
+					menu->openMenu(4);
+				}),
+				new MenuItem("Credits", [&] {
+					menu->close();
+					menu->openMenu(5);
+				}),
 				new MenuItem("Stay home", [&] {
 					exit(0);
 				}),
@@ -45,6 +58,37 @@ public:
 					menu->openMenu(1);
 				}),
 				new MenuItem("Retake test", [&] {
+					menu->close();
+					menu->openMenu(0);
+				}),
+			}, 100, 150, 50)),
+			new MenuScreen("Best students", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
+			MenuItem::generateItemList({
+				new MenuItem("Return to Title", [&] {
+					menu->close();
+					menu->openMenu(0);
+				}),
+			}, 100, 150, 50)),
+			new MenuScreen("How to study", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
+			MenuItem::generateItemList({
+				new MenuItem("1. Dodge obstacles to survive", [&] {}),
+				new MenuItem("2. Press Spacebar to Jump", [&] {}),
+				new MenuItem("3. Hold Spacebar to jump longer", [&] {}),
+				new MenuItem("4. Hold Shift to fall faster", [&] {}),
+				new MenuItem("5. Get better Hoc Bong with each 1000 DRL", [&] {}),
+				new MenuItem("6. IMPORTANT: Have fun!", [&] {}),
+				new MenuItem("Return to Title", [&] {
+					menu->close();
+					menu->openMenu(0);
+				}),
+			}, 100, 150, 50)),
+			new MenuScreen("Credits", window->window.getSize().x,  window->window.getSize().y, "content/background1.jpg",
+			MenuItem::generateItemList({
+				new MenuItem("20200451 Bui Hoang Nhat", [&] {}),
+				new MenuItem("20203323 Tran Van Bang", [&] {}),
+				new MenuItem("20203409 Tran Son Hai", [&] {}),
+				new MenuItem("20203509 Nguyen Vu Duc Minh", [&] {}),
+				new MenuItem("Return to Title", [&] {
 					menu->close();
 					menu->openMenu(0);
 				}),
@@ -109,6 +153,18 @@ public:
 
 		};
 	};
+	void buildScore() {
+		std::vector<MenuItem*> menuItems;
+		std::vector<int> pointArray = Game::getAllPoints();
+		for (auto& point : pointArray) {
+			menuItems.push_back(new MenuItem("Hoc Bong: " + Game::getRank(point) + " | DRL: " + std::to_string(point), [&] {}));
+		}
+		menuItems.push_back(new MenuItem("Return to Title", [&] {
+			menu->close();
+			menu->openMenu(0);
+			}));
+		menu->menuArray[3]->menuItems = MenuItem::generateItemList(menuItems, 100, 150, 50);
+	}
 	//Bắt đầu trò chơi
 	void start()
 	{

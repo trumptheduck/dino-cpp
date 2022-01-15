@@ -13,6 +13,8 @@
 #include "Classes/Player/Player.h"
 #include "Classes/Emitter/Emitter.h"
 #include <math.h>
+#include <fstream>
+
 
 class Loader {
 public:
@@ -34,6 +36,59 @@ class Game
 {
 
 public:
+	static std::vector<int> getAllPoints() {
+		std::vector<int> points;
+		std::string line;
+
+		std::ifstream input_file("content/get_score.txt"); // open file
+		if (!input_file.is_open())            // kiểm tra file đã mở hay chưa
+		{
+			std::cout << "Could not open the file" << std::endl;
+		}
+		else
+		{
+			while (std::getline(input_file, line)) // lấy các kí tự theo dòng
+			{
+				points.push_back(stoi(line));        // thêm vào mảng vector kiểu string
+			}
+		}
+		return points;
+	}
+	static void setPoint(int point) {
+		std::vector<int> pointArray = getAllPoints();
+		pointArray.push_back(point);
+		std::sort(pointArray.begin(), pointArray.end(), std::greater<int>());
+		int length = pointArray.size() < 10 ? pointArray.size() : 10;
+		FILE* fp = NULL;
+		fp = fopen("content/get_score.txt", "w");
+		for (int i = 0; i < length; i++) {
+			fprintf(fp, "%d\n", pointArray[i]);
+		}
+		fclose(fp);
+	}
+	static std::string getRank(int score) {
+		float rankGap = 1000;
+		if (score >= rankGap * 6) {
+			return "S+";
+		}
+		if (score >= rankGap * 5) {
+			return "S";
+		}
+		if (score >= rankGap * 4) {
+			return "A";
+		}
+		if (score >= rankGap * 3) {
+			return "B";
+		}
+		if (score >= rankGap * 2) {
+			return "C";
+		}
+		if (score >= rankGap * 1) {
+			return "D";
+		}
+		return "F";
+	}
+	//////////////////////////////////////////////////
 	//Basic parameters
 	float mWidth = 0;
 	float mHeight = 0;
@@ -132,7 +187,11 @@ public:
 		return array[r];
 	}
 	void lose() {
+		setPoint(getPoint());
 		isOver = true;
+	}
+	int getPoint() {
+		return (int)round((difficulty - 1) * scoreMultiplier);
 	}
 	void tick(SFMLWindow* window) {
 		//Xóa những GameObject đã được thêm vào mảng xóa
@@ -205,42 +264,20 @@ public:
 		window->display();
 	}
 	void drawUI(SFMLWindow* window) {
-		window->drawText(20, 20, "Diem Ren Luyen: " + std::to_string((int)round((difficulty - 1) * scoreMultiplier)), sf::Color::Red, 30);
-		window->drawText(20, 70, "Hoc Bong: " + getRank(), sf::Color::White, 30);
+		window->drawText(20, 20, "Diem Ren Luyen: " + std::to_string(getPoint()), sf::Color::Red, 30);
+		window->drawText(20, 70, "Hoc Bong: " + getRank(getPoint()), sf::Color::White, 30);
 		if (isOver) {
 			sf::RectangleShape overlay;
 			overlay.setSize(sf::Vector2f(window->window.getSize().x, window->window.getSize().y));
 			overlay.setFillColor(sf::Color(0, 0, 0, 128));
 			window->window.draw(overlay);
 			window->drawText(300, 250, "YOU CAN STUDY NOMORE!", sf::Color::Red, 60);
-			window->drawText(300, 350, "Diem Ren Luyen: " + std::to_string((int)round((difficulty - 1) * scoreMultiplier)), sf::Color::White, 30);
-			window->drawText(300, 400, "Hoc Bong: " + getRank(), sf::Color::White, 30);
+			window->drawText(300, 350, "Diem Ren Luyen: " + std::to_string(getPoint()), sf::Color::White, 30);
+			window->drawText(300, 400, "Hoc Bong: " + getRank(getPoint()), sf::Color::White, 30);
 			window->drawText(300, 450, "Press Esc to Retake Entrance Test", sf::Color::White, 30);
 		}
 	}
-	std::string getRank() {
-		float score = (difficulty - 1) * scoreMultiplier;
-		float rankGap = 1000;
-		if (score >= rankGap * 6) {
-			return "S+";
-		}
-		if (score >= rankGap * 5) {
-			return "S";
-		}
-		if (score >= rankGap * 4) {
-			return "A";
-		}
-		if (score >= rankGap * 3) {
-			return "B";
-		}
-		if (score >= rankGap * 2) {
-			return "C";
-		}
-		if (score >= rankGap * 1) {
-			return "D";
-		}
-		return "F";
-	}
+
 	//Thêm vật cản vào mảng vật cản
 	void addObstacle(Obstacle* obstacle)
 	{
