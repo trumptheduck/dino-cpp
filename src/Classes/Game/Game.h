@@ -40,16 +40,16 @@ public:
 		std::vector<int> points;
 		std::string line;
 
-		std::ifstream input_file("content/get_score.txt"); // open file
-		if (!input_file.is_open())            // kiểm tra file đã mở hay chưa
+		std::ifstream input_file("content/get_score.txt");
+		if (!input_file.is_open())
 		{
 			std::cout << "Could not open the file" << std::endl;
 		}
 		else
 		{
-			while (std::getline(input_file, line)) // lấy các kí tự theo dòng
+			while (std::getline(input_file, line))
 			{
-				points.push_back(stoi(line));        // thêm vào mảng vector kiểu string
+				points.push_back(stoi(line));
 			}
 		}
 		return points;
